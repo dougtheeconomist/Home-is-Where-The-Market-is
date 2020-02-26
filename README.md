@@ -11,11 +11,15 @@ With an asset as expensive as a house, making either a purchase or a sale is no 
 
 In order to address this issue I obtain real estate market data from Zillow, as well as economic data published by various government agencies. Once I collect and compile the data into a format that is compatible with analysis of panel data the first step is to take a look at the data and see what I have. 
 
-I first look at the variable that I am most interested in predicting; median sale price. I get an idea of what is going on as a whole, and then take a look at the spread of  the mean of all markets medians through time, and finally look at the spread of the means grouped by year across the different markets. 
+I first look at the variable that I am most interested in predicting; median sale price. I get an idea of what is going on as a whole with the following histogram.  
 
 ![total_spread_hist](images/tot_medprice.png)
 
+The next histogram shows the spread of the average of all markets' medians grouped by time. 
+
 ![mean_across_cities_hist](images/mean_medprice_gbtime.png)
+
+Then I look at the spread of the means grouped by city across the different time-spans.
 
 ![mean_over_time_hist](images/mean_medprice_gbcity.png)
 
@@ -23,3 +27,4 @@ Lastly I look at a plot of this variable over time for a single market, I choose
 
 ![snapshot_of_different_markets](images/sample_cities_medprice.png)
 
+One thing to note is that the data for Florence, Mississippi only goes back to 2014. While many cities do have data extending back into 2008, there are a number that do not. 
