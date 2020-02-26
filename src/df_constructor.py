@@ -1,12 +1,12 @@
 # Title: df Contructor
 # Author: Doug Hart
 # Date Created: 2/25/2020
-# Last Updated: 2/25/2020
+# Last Updated: 2/26/2020
 
 import pandas as pd 
 import numpy as np
 import multiprocessing as mp
-from functions import convert_panel
+from functions import convert_panel, int_convert
 
 #reading in and restructuring my data to fit panel format
 df = pd.read_csv('medsales.csv',header=None)
@@ -100,7 +100,9 @@ pool.close()
 #next to implement multi index, consulting with Nik tells me
 #this may be easier by just declaring new df with multi index
 #then adding in data columns
-new = pd.DataFrame(index=[final.date, final.id])
+final.date = pd.to_datetime(final.date, format= "%Y/%m")
+
+new = pd.DataFrame(index=[final.id, final.date])
 
 #without .values, pandas frustratingly wants to convert everything to nan
 new['city']= final.city.values
@@ -113,3 +115,5 @@ new['percent_foreclosed'] = final.percent_foreclosed.values
 new['num_listed'] = final.num_listed.values
 new['new_listing_m'] = final.new_listing_m.values
 new['med_daily_inv'] = final.med_daily_inv.values
+
+new.index.names = ['city_id', 'date']

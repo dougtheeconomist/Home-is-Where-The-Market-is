@@ -1,7 +1,7 @@
 # Title: functions
 # Author: Doug Hart
 # Date Created: 2/25/2020
-# Last Updated: 2/25/2020
+# Last Updated: 2/26/2020
 
 import pandas as pd
 import numpy as np
@@ -28,9 +28,10 @@ def convert_panel(df,ec):
 
     return final_form
 
+
 def int_convert(val):
     crit = type(val)
     if crit == str:
-        val = int(val)
+        val = float(val)
     return val
     
