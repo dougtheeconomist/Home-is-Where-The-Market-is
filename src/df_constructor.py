@@ -81,5 +81,35 @@ final.shape
 
 final.drop('state_y', inplace=True, axis = 1)
 final.drop('state_x', inplace=True, axis = 1)
+final.drop('state', inplace =True, axis = 1)
 
 final.rename(columns = {'perm_state':'state'}, inplace = True)
+
+#Turns out this is ALL strings. All strings all day. Next I convert
+pool = mp.Pool(mp.cpu_count())
+final.med_price_cut = pool.map(int_convert,[row for row in final.med_price_cut])
+final.sale_count = pool.map(int_convert,[row for row in final.sale_count])
+final.med_price = pool.map(int_convert,[row for row in final.med_price])
+final.med_days_listed = pool.map(int_convert,[row for row in final.med_days_listed])
+final.percent_foreclosed = pool.map(int_convert,[row for row in final.percent_foreclosed])
+final.num_listed = pool.map(int_convert,[row for row in final.num_listed])
+final.new_listing_m = pool.map(int_convert,[row for row in final.new_listing_m])
+final.med_daily_inv = pool.map(int_convert,[row for row in final.med_daily_inv])
+pool.close()
+
+#next to implement multi index, consulting with Nik tells me
+#this may be easier by just declaring new df with multi index
+#then adding in data columns
+new = pd.DataFrame(index=[final.date, final.id])
+
+#without .values, pandas frustratingly wants to convert everything to nan
+new['city']= final.city.values
+new['state'] = final.state.values
+new['med_price'] = final.med_price.values
+new['sale_count']= final.sale_count.values
+new['med_price_cut'] = final.med_price_cut.values
+new['med_days_listed'] = final.med_days_listed.values
+new['percent_foreclosed'] = final.percent_foreclosed.values
+new['num_listed'] = final.num_listed.values
+new['new_listing_m'] = final.new_listing_m.values
+new['med_daily_inv'] = final.med_daily_inv.values

@@ -27,3 +27,10 @@ def convert_panel(df,ec):
         final_form = np.vstack([final_form, addition])
 
     return final_form
+
+def int_convert(val):
+    crit = type(val)
+    if crit == str:
+        val = int(val)
+    return val
+    
