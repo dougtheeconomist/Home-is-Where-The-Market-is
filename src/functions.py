@@ -34,4 +34,16 @@ def int_convert(val):
     if crit == str:
         val = float(val)
     return val
+
+
+def run_arima(series, date, p,d,q):
+    '''should run ARIMA regression on specified series
+    need to add returns for fit statistics for comparison
+    series: column of df to forecast
+    dates: date column, as multi-index doesn't seem compatible here
     
+    The (p,d,q) order of the model for the number of AR parameters,
+    differences, and MA parameters to use.
+    '''
+    model = ARIMA(series, dates = date, order=(p, d, q))
+    return model.fit()
