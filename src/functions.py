@@ -47,3 +47,85 @@ def run_arima(series, date, p,d,q):
     '''
     model = ARIMA(series, dates = date, order=(p, d, q))
     return model.fit()
+
+
+'''~~~~~~~~~~~~~~~~~~~~~~~~~~From The Ether~~~~~~~~~~~~~~~~~~~~~~~~~~'''
+
+
+def evaluate_arima_model(X, timevar, arima_order):
+	# prepare training dataset
+	train_size = int(len(X) * 0.66)
+	train, test = X[0:train_size], X[train_size:]
+	history = [x for x in train]
+	# make predictions
+	predictions = list()
+	for t in range(len(test)):
+		model = ARIMA(history, dates= timevar, order=arima_order)
+		model_fit = model.fit(disp=0)
+		yhat = model_fit.forecast()[0]
+		predictions.append(yhat)
+		history.append(test[t])
+	# calculate out of sample error
+	error = mean_squared_error(test, predictions)
+	return error
+
+
+import warnings
+warnings.filterwarnings("ignore")
+
+# evaluate combinations of p, d and q values for an ARIMA model
+#this requires lists of potential values for p,d,q
+
+p_values = [0, 1, 2, 4, 6, 8, 10]
+d_values = range(0, 6)
+q_values = range(0, 6)
+def evaluate_models(dataset, timevar, p_values, d_values, q_values):
+	# dataset = dataset.astype('float32')
+	best_score, best_cfg = float("inf"), None
+	for p in p_values:
+		for d in d_values:
+			for q in q_values:
+				order = (p,d,q)
+				try:
+					mse = evaluate_arima_model(dataset, order, dates = timevar)
+					if mse < best_score:
+						best_score, best_cfg = mse, order
+					print('ARIMA%s MSE=%.3f' % (order,mse))
+				except:
+					continue
+	print('Best ARIMA%s MSE=%.3f' % (best_cfg, best_score))
+
+
+# def batch_producer(raw_data, batch_size, num_steps):
+#     # raw_data = tf.convert_to_tensor(raw_data, name="raw_data", dtype=tf.int32)
+
+#     data_len = tf.size(raw_data)
+#     batch_len = data_len // batch_size
+#     data = tf.reshape(raw_data[0: batch_size * batch_len],
+#                       [batch_size, batch_len])
+
+#     epoch_size = (batch_len - 1) // num_steps
+
+#     i = tf.train.range_input_producer(epoch_size, shuffle=False).dequeue()
+#     x = data[:, i * num_steps:(i + 1) * num_steps]
+#     x.set_shape([batch_size, num_steps])
+#     y = data[:, i * num_steps + 1: (i + 1) * num_steps + 1]
+#     y.set_shape([batch_size, num_steps])
+#     return x, y
+
+def batch_producer(raw_data, data_len, batch_size, num_steps):
+    # raw_data = tf.convert_to_tensor(raw_data, name="raw_data", dtype=tf.int32)
+
+    # data_len = tf.size(raw_data)
+    batch_len = data_len // batch_size
+    data = tf.reshape(raw_data[0: batch_size * batch_len],
+                      [batch_size, batch_len])
+
+    epoch_size = (batch_len - 1) // num_steps
+    
+    i = tf.train.range_input_producer(epoch_size, shuffle=False).dequeue()
+    x = data[:, i * num_steps:(i + 1) * num_steps]
+    x.set_shape([batch_size, num_steps])
+    y = data[:, i * num_steps + 1: (i + 1) * num_steps + 1]
+    y.set_shape([batch_size, num_steps])
+    return x, y
