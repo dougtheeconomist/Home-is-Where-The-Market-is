@@ -72,6 +72,38 @@ def estimates_store(model):
     return estimates_stats
 
 
+def winpan_helper(data, n_prev):
+    n_predictions = len(data) - n_prev
+    y = data[n_prev:]
+    # this might be too clever
+    indices = np.arange(n_prev) + np.arange(n_predictions)[:, None]
+    x = data[indices, None]
+    xlist = [i for i in x]
+    ylist = [i for i in y]
+    return xlist, ylist
+
+
+
+def windowize_pan_data(data, id, n_prev):
+    gx = []
+    gy = []
+    for i in sdf.cid:
+        gslice = []
+        for j in range(0, sdf.shape[0]):
+            if sdf.cid[j] == i:
+                gslice.append(sdf.med_price[j])
+
+        gser = pd.Series(gslice)
+    #     print('*')
+        glists, gvals = winpan_helper(gser, n_prev)
+        gy += gvals
+        gx += glists
+    return gx, gy
+
+
+
+
+
 '''~~~~~~~~~~~~~~~~~~~~~~~~Modified From The Ether~~~~~~~~~~~~~~~~~~~~~~~~'''
 
 

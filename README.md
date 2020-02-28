@@ -34,5 +34,7 @@ One thing to note is that the data for Florence, Mississippi only goes back to 2
 My goal is to generate predictions about future home prices using two different models; first what I consider a more traditional econometric approach with an ARIMA model, and then a recurrent neural network machine learning model. Once I have calibrated predictions from both models I will ensemble the results together to serve as my final output. The advantage to this approach is that ensemble models tend to outperform standalone models both in the fields of data science and economics, and this study can basically be thought of as an exercise in macro-economic forecasting. This phenomenon is due to the fact that different modeling approaches can pick up on different nuances within the data structure, and the fact that an ensemble tends diversify away bias without trading off too heavily with variance, the same way that stock diversification reduces portfolio risk. 
 
 I choose to start with ARIMA as this is the approach that I am more familiar with via my past education in econometric forecasting. 
-In order to tune my model to the data I conduct a grid search to optimize the number of auto regressions, differences and past values to take when calculating moving average to minimize error. 
+In order to tune my model to the data I conduct a grid search to optimize the number of auto regressions, differences and past values to take when calculating moving average to minimize error. Grid searching with a simple ARIMA model(no other explanatory variables) concludes that the ideal specification is as an AR(1) model with one difference and a moving average over two periods. 
+
+I then 
 
