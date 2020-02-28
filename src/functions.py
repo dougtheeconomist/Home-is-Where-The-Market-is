@@ -35,6 +35,8 @@ def int_convert(val):
         val = float(val)
     return val
 
+def format_list_of_floats(L):
+    return ["{0:2.2f}".format(f) for f in L]
 
 def run_arima(series, date, p,d,q):
     '''should run ARIMA regression on specified series
@@ -45,11 +47,32 @@ def run_arima(series, date, p,d,q):
     The (p,d,q) order of the model for the number of AR parameters,
     differences, and MA parameters to use.
     '''
-    model = ARIMA(series, dates = date, order=(p, d, q))
-    return model.fit()
+    model = ARIMA(series, dates = date, order=(p, d, q)).fit()
+    
+    fig, ax = plt.subplots(1, figsize=(14, 4))
+    ax.plot(series.index, series)
+    fig = model.plot_predict('2020-1-1', '2021', 
+                                  dynamic=True, ax=ax, plot_insample=False)
+    
+    print("ARIMA(1, 1, 5) coefficients from first model:\n  Intercept {0:2.2f}\n  AR {1}".format(
+    model.params[0], 
+        format_list_of_floats(list(model.params[1:]))
+    ))
+    
+    return model
+
+#Work in progress, will likely have to come back and employ OOP to get right
+estimates_stats = dict()
+def estimates_store(model):
+#     if estimates_stats:
+    estimates_stats.update({model: (model.aic, model.bic)})
+#     else:
+#         estimates_stats = dict()
+#         estimates_stats.update({model: (model.aic, model.bic)})
+    return estimates_stats
 
 
-'''~~~~~~~~~~~~~~~~~~~~~~~~~~From The Ether~~~~~~~~~~~~~~~~~~~~~~~~~~'''
+'''~~~~~~~~~~~~~~~~~~~~~~~~Modified From The Ether~~~~~~~~~~~~~~~~~~~~~~~~'''
 
 
 def evaluate_arima_model(X, timevar, arima_order):
@@ -70,30 +93,23 @@ def evaluate_arima_model(X, timevar, arima_order):
 	return error
 
 
-import warnings
-warnings.filterwarnings("ignore")
 
-# evaluate combinations of p, d and q values for an ARIMA model
-#this requires lists of potential values for p,d,q
-
-p_values = [0, 1, 2, 4, 6, 8, 10]
-d_values = range(0, 6)
-q_values = range(0, 6)
 def evaluate_models(dataset, timevar, p_values, d_values, q_values):
-	# dataset = dataset.astype('float32')
-	best_score, best_cfg = float("inf"), None
-	for p in p_values:
-		for d in d_values:
-			for q in q_values:
-				order = (p,d,q)
-				try:
-					mse = evaluate_arima_model(dataset, order, dates = timevar)
-					if mse < best_score:
-						best_score, best_cfg = mse, order
-					print('ARIMA%s MSE=%.3f' % (order,mse))
-				except:
-					continue
-	print('Best ARIMA%s MSE=%.3f' % (best_cfg, best_score))
+    dataset = dataset.astype('float32')
+    best_score, best_cfg = float("inf"), None
+    for p in p_values:
+        print('*')
+        for d in d_values:
+            for q in q_values:
+                order = (p,d,q)
+                try:
+                    mse = evaluate_arima_model(dataset, timevar, order)
+                    if mse < best_score:
+                        best_score, best_cfg = mse, order
+                    print('ARIMA%s MSE=%.3f' % (order,mse))
+                except:
+                    continue
+    print('Best ARIMA%s MSE=%.3f' % (best_cfg, best_score))
 
 
 # def batch_producer(raw_data, batch_size, num_steps):
@@ -122,7 +138,7 @@ def batch_producer(raw_data, data_len, batch_size, num_steps):
                       [batch_size, batch_len])
 
     epoch_size = (batch_len - 1) // num_steps
-    
+
     i = tf.train.range_input_producer(epoch_size, shuffle=False).dequeue()
     x = data[:, i * num_steps:(i + 1) * num_steps]
     x.set_shape([batch_size, num_steps])
