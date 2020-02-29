@@ -1,7 +1,7 @@
 # Title: functions
 # Author: Doug Hart
 # Date Created: 2/25/2020
-# Last Updated: 2/26/2020
+# Last Updated: 2/28/2020
 
 import pandas as pd
 import numpy as np
@@ -73,6 +73,15 @@ def estimates_store(model):
 
 
 def winpan_helper(data, n_prev):
+    '''
+    Modified windowizer function specifically to work with the windowizer
+    function for panel data. Passes back lists for x,y of individual panel
+    to be aggregated together for n_panels in outer function.
+
+    data: series passed in from windowize_pan_data
+
+    n_prev: number of previous values to use as x variables for y
+    '''
     n_predictions = len(data) - n_prev
     y = data[n_prev:]
     # this might be too clever
@@ -85,13 +94,23 @@ def winpan_helper(data, n_prev):
 
 
 def windowize_pan_data(data, id, n_prev):
+    '''
+    For creating previous time windows to be used as independent variables X
+    for y from panel data. 
+
+    data: pandas series to predict
+
+    id_: pandas series used to id panel groups
+
+    n_prev: number of previous values to use as x variables for y
+    '''
     gx = []
     gy = []
-    for i in sdf.cid:
+    for i in id_:
         gslice = []
-        for j in range(0, sdf.shape[0]):
-            if sdf.cid[j] == i:
-                gslice.append(sdf.med_price[j])
+        for j in range(0, data.shape[0]):
+            if id_[j] == i:
+                gslice.append(data[j])
 
         gser = pd.Series(gslice)
     #     print('*')
@@ -99,7 +118,7 @@ def windowize_pan_data(data, id, n_prev):
         gy += gvals
         gx += glists
     return gx, gy
-
+    
 
 
 

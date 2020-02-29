@@ -36,5 +36,7 @@ My goal is to generate predictions about future home prices using two different 
 I choose to start with ARIMA as this is the approach that I am more familiar with via my past education in econometric forecasting. 
 In order to tune my model to the data I conduct a grid search to optimize the number of auto regressions, differences and past values to take when calculating moving average to minimize error. Grid searching with a simple ARIMA model(no other explanatory variables) concludes that the ideal specification is as an AR(1) model with one difference and a moving average over two periods. 
 
-I then 
+I then attempt to create a second forecast using recurring neural networks, which is a deep-learning machine learning algorithm. In order to train this model, I input data on housing prices from (TBA) different states. I utilize a Long Short Term Memory (LSTM) network of neural layers, which in laymen’s terms means that my neural network retains memory of events further back in the past as well as the immediate past when making future predictions. This is a fairly standard method when using neural networks for time series forecasting. 
+generate predictions for markets within Washington state. 
+
 
