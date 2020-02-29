@@ -1,6 +1,8 @@
 # Homes_For_Sale
 Building a predictive model of the housing market
 
+![Header_image](for_sale_header1.png)
+
 ## Introduction
 
 In the U.S., over 14,000 homes are bought and sold every day! With the baby boomer generation reaching retirement age and coming to a point in their lives when moving out of their family rearing homes makes sense this number may be increasing. 
