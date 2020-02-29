@@ -1,7 +1,7 @@
 # Homes_For_Sale
 Building a predictive model of the housing market
 
-![Header_image](for_sale_header1.png)
+![Header_image](for_sale_header1.jpg)
 
 ## Introduction
 
