@@ -120,6 +120,54 @@ def windowize_pan_data(data, id, n_prev):
     return gx, gy
     
 
+def windowize_pan_data_LD(data, id, n_prev):
+    '''
+    For creating previous time windows to be used as independent variables X
+    for y from panel data. This version transforms series in question to be 
+    first difference of logarithm base e of original series. 
+
+    data: pandas series to predict
+
+    id_: pandas series used to id panel groups
+
+    n_prev: number of previous values to use as x variables for y
+    '''
+    gx = []
+    gy = []
+    for i in id_:
+        gslice = []
+        for j in range(0, data.shape[0]):
+            if id_[j] == i:
+                gslice.append(data[j])
+
+        gser = pd.Series(gslice)
+        lgser = pd.Series(np.log(gser))
+        sdf['fstd'] = None
+        for k in range(0, len(lgser)):
+            ldgser[k] = (lgser[k]-lgser[k-1])
+    #     print('*')
+        glists, gvals = winpan_helper(ldgser, n_prev)
+        gy += gvals
+        gx += glists
+    return gx, gy
+
+def reconstruct(series, start):
+    '''
+    takes predictions from rnn model in the form of differenced log of original 
+    variable and un-differences then reverses logarithmic transformation to 
+    return interpretable results of rnn forecast. 
+
+    series: series of predictions generated with rnn
+
+    start: last value prior to start of forecast, used to un-first-difference
+            the data. Must be in logarithmic form
+    '''
+    predlist = [start]
+    for k in range(0, len(series)):
+            predlist.append(predlist[-1]+lgser[k])
+    final_predictions = [np.e**val for val in predlist]
+
+    return final_predictions
 
 
 
