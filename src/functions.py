@@ -1,10 +1,22 @@
 # Title: functions
 # Author: Doug Hart
 # Date Created: 2/25/2020
-# Last Updated: 2/28/2020
+# Last Updated: 2/29/2020
 
 import pandas as pd
 import numpy as np
+from sklearn.metrics import mean_squared_error
+import plotly.express as px
+import datetime
+import matplotlib.pyplot as plt
+%matplotlib inline
+import statsmodels.api as sm
+from statsmodels.tsa.arima_model import ARIMA
+from statsmodels.tsa.arima_process import ArmaProcess
+import tensorflow as tf
+keras = tf.keras
+from scipy import stats
+from sklearn.model_selection import train_test_split
 
 def convert_panel(df,ec):
     '''
@@ -169,6 +181,16 @@ def reconstruct(series, start):
 
     return final_predictions
 
+def ensemble(m1,m2):
+    me = []
+    for i in range(0, len(m1)):
+        me.append(np.mean(m1[i],m2[i]))
+    out = np.array(me)
+    return out
+
+def predict_gen(df):
+    for i in range(0, df.shape[0]):
+        df.city[i]
 
 
 '''~~~~~~~~~~~~~~~~~~~~~~~~Modified From The Ether~~~~~~~~~~~~~~~~~~~~~~~~'''
@@ -244,3 +266,25 @@ def batch_producer(raw_data, data_len, batch_size, num_steps):
     y = data[:, i * num_steps + 1: (i + 1) * num_steps + 1]
     y.set_shape([batch_size, num_steps])
     return x, y
+
+'''~~~~~~~~~~~~~~~~~~~~~~~~~~Borrowed from Lecture~~~~~~~~~~~~~~~~~~~~~~~~~~'''
+
+def windowize_data(data, n_prev):
+    n_predictions = len(data) - n_prev
+    y = data[n_prev:]
+    # this might be too clever
+    indices = np.arange(n_prev) + np.arange(n_predictions)[:, None]
+    x = data[indices, None]
+    return x, y
+
+def split_and_windowize(data, n_prev, fraction_test=0.3):
+    n_predictions = len(data) - 2*n_prev
+    
+    n_test  = int(fraction_test * n_predictions)
+    n_train = n_predictions - n_test   
+    
+    x_train, y_train = windowize_data(data[:n_train], n_prev)
+    x_test, y_test = windowize_data(data[n_train:], n_prev)
+    return x_train, x_test, y_train, y_test
+
+

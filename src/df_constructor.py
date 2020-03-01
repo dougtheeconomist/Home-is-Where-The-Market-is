@@ -1,7 +1,7 @@
 # Title: df Contructor
 # Author: Doug Hart
 # Date Created: 2/25/2020
-# Last Updated: 2/26/2020
+# Last Updated: 3/1/2020
 
 import pandas as pd 
 import numpy as np
@@ -117,3 +117,48 @@ new['new_listing_m'] = final.new_listing_m.values
 new['med_daily_inv'] = final.med_daily_inv.values
 
 new.index.names = ['city_id', 'date']
+
+#Next I repeat this process with data for various home sizes for deeper analysis
+#I don't group this all into a function because of run time, I probably should
+
+condo = pd.read_csv('condos.csv', header=None)
+condo.drop(4, axis=1, inplace=True)
+panel_ready = convert_panel(condo,4)
+dfpr = pd.DataFrame(panel_ready)
+dfpr.to_pickle('condo.pkl', compression='zip')
+
+obd = pd.read_csv('onebedroom.csv', header=None)
+obd.drop(4, axis=1, inplace=True)
+next_sheet = convert_panel(obd,4)
+obdp = pd.DataFrame(next_sheet)
+obdp.to_pickle('obr.pkl', compression='zip')
+
+tbr = pd.read_csv('twobedroom.csv', header=None)
+tbr.drop(4, axis=1, inplace=True)
+next_sheet2 = convert_panel(tbr,4)
+tbrp = pd.DataFrame(next_sheet2)
+tbrp.to_pickle('tbr.pkl', compression='zip')
+
+threebr = pd.read_csv('threebedroom.csv', header=None)
+threebr.drop(5, axis=1, inplace=True)
+threebr.drop(4, axis=1, inplace=True)
+next_sheet4 = convert_panel(threebr,4)
+threebrp = pd.DataFrame(next_sheet4)
+threebrp.to_pickle('threebr.pkl', compression='zip')
+
+fourbr = pd.read_csv('fourbedroom.csv', header=None)
+fourbr.drop(5, axis=1, inplace=True)
+fourbr.drop(4, axis=1, inplace=True)
+next_sheet5 = convert_panel(fourbr,4)
+fourbrp = pd.DataFrame(next_sheet5)
+fourbrp.to_pickle('fourbr.pkl', compression='zip')
+
+fplus = pd.read_csv('five_plus.csv', header=None)
+fplus.drop(5, axis=1, inplace=True)
+fplus.drop(4, axis=1, inplace=True)
+next_sheet3 = convert_panel(fplus,4)
+fplusp = pd.DataFrame(next_sheet3)
+fplusp.to_pickle('fplus.pkl', compression='zip')
+
+
+

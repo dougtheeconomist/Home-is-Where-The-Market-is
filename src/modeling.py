@@ -1,7 +1,10 @@
 # Title: Housing Modeling
 # Author: Doug Hart
 # Date Created: 2/27/2020
-# Last Updated: 2/28/2020
+# Last Updated: 3/1/2020
+
+import warnings
+warnings.filterwarnings("ignore")
 
 import pandas as pd
 import numpy as np
@@ -14,10 +17,14 @@ from statsmodels.tsa.arima_model import ARIMA
 from statsmodels.tsa.arima_process import ArmaProcess
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from sklearn.metrics import mean_squared_error
-from functions import evaluate_models, evaluate_arima_model, format_list_of_floats, run_arima
 
-import warnings
-warnings.filterwarnings("ignore")
+import tensorflow as tf
+keras = tf.keras
+from scipy import stats
+from sklearn.model_selection import train_test_split
+
+from functions import windowize_pan_data, windowize_pan_data_LD, winpan_helper evaluate_models, evaluate_arima_model, format_list_of_floats, run_arima, windowize_data, split_and_windowize
+
 
 df = pd.read_pickle('user_ready.pkl',compression='zip')
 sdf =  df.loc['16037']  #df[df["city_id"] == 16037]
@@ -33,3 +40,30 @@ evaluate_models(sdf.med_price, sdf.date2, p_values,d_values, q_values)
 
 gs_approved_model = run_arima(sdf.med_price, sdf.date2, 1,1,2)
 gs_approved_model.summary()
+
+
+'''~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~RNN Model~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'''
+#Now to build RNN model using LSTM layers
+
+#setting the number of previous values to utilize in predicting next value
+n_prev = 12
+
+#rather than traditional test/train split, using data outside WA for train data
+
+
+#Instantiating Model
+Lex = keras.Sequential()
+Lex.add(keras.layers.LSTM(32, input_shape=(n_prev, 1), return_sequences=True))
+Lex.add(keras.layers.LSTM(32, return_sequences=False))
+Lex.add(keras.layers.Dense(1, activation='linear'))
+Lex.compile(optimizer='adam',
+              loss='mse')
+
+
+#Optional print model summary
+Lex.summary()
+
+#Fitting model with training data, setting epochs to five for now, can always do additional training later
+Lex.fit(x_train, y_train, epochs=5)
+
+
