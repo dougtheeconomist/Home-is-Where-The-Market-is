@@ -18,6 +18,10 @@ keras = tf.keras
 from scipy import stats
 from sklearn.model_selection import train_test_split
 
+def make_date(val):
+    x= datetime.datetime(int(val[0:4]), int(val[5:8]), 1)
+    return x
+
 def convert_panel(df,ec):
     '''
     takes csv with a single variabe organized by group with columns for 
@@ -157,7 +161,7 @@ def windowize_pan_data_LD(data, id, n_prev):
         sdf['fstd'] = None
         for k in range(0, len(lgser)):
             ldgser[k] = (lgser[k]-lgser[k-1])
-    #     print('*')
+    
         glists, gvals = winpan_helper(ldgser, n_prev)
         gy += gvals
         gx += glists
@@ -191,29 +195,35 @@ def ensemble(m1,m2):
 def predict_gen(df):
     for i in range(0, df.shape[0]):
         df.city[i]
+    return None
+
+def assign_names(df):
+    df.rename(columns={0: 'date', 
+                   1: 'id', 2: 'city', 3: 'state', 4: 'est_val' }, inplace=True)
+    return df
 
 
 '''~~~~~~~~~~~~~~~~~~~~~~~~Modified From The Ether~~~~~~~~~~~~~~~~~~~~~~~~'''
 
 
 def evaluate_arima_model(X, timevar, arima_order):
-	# prepare training dataset
-	train_size = int(len(X) * 0.66)
-	train, test = X[0:train_size], X[train_size:]
-	history = [x for x in train]
-	# make predictions
-	predictions = list()
-	for t in range(len(test)):
-		model = ARIMA(history, dates= timevar, order=arima_order)
-		model_fit = model.fit(disp=0)
-		yhat = model_fit.forecast()[0]
-		predictions.append(yhat)
-		history.append(test[t])
-	# calculate out of sample error
-	error = mean_squared_error(test, predictions)
-	return error
-
-
+    # prepare training dataset
+    train_size = int(len(X) * 0.66)
+    train, test = X[0:train_size], X[train_size:]
+    history = [x for x in train]
+    # make predictions
+    predictions = list()
+    for t in range(len(test)):
+        model = ARIMA(history, dates= timevar, order=arima_order)
+        model_fit = model.fit(disp=0)
+        yhat = model_fit.forecast()[0]
+        predictions.append(yhat)
+        history.append(test[t])
+    # calculate out of sample error
+    error = mean_squared_error(test, predictions)
+    bic = model.bic
+    aic = modle.aic
+    return error, aic, bic
 
 def evaluate_models(dataset, timevar, p_values, d_values, q_values):
     dataset = dataset.astype('float32')
@@ -224,13 +234,30 @@ def evaluate_models(dataset, timevar, p_values, d_values, q_values):
             for q in q_values:
                 order = (p,d,q)
                 try:
-                    mse = evaluate_arima_model(dataset, timevar, order)
+                    mse , aic, bic = evaluate_arima_model(dataset, timevar, order)
                     if mse < best_score:
                         best_score, best_cfg = mse, order
-                    print('ARIMA%s MSE=%.3f' % (order,mse))
+                    print('ARIMA%s MSE=%.3f AIC%s BIC%s' % (order,mse, aic, bic))
                 except:
                     continue
     print('Best ARIMA%s MSE=%.3f' % (best_cfg, best_score))
+
+# def evaluate_models(dataset, timevar, p_values, d_values, q_values):
+#     dataset = dataset.astype('float32')
+#     best_score, best_cfg = float("inf"), None
+#     for p in p_values:
+#         print('*')
+#         for d in d_values:
+#             for q in q_values:
+#                 order = (p,d,q)
+#                 try:
+#                     mse = evaluate_arima_model(dataset, timevar, order)
+#                     if mse < best_score:
+#                         best_score, best_cfg = mse, order
+#                     print('ARIMA%s MSE=%.3f' % (order,mse))
+#                 except:
+#                     continue
+#     print('Best ARIMA%s MSE=%.3f' % (best_cfg, best_score))
 
 
 # def batch_producer(raw_data, batch_size, num_steps):

@@ -1,7 +1,7 @@
 # Title: Housing Modeling
 # Author: Doug Hart
 # Date Created: 2/27/2020
-# Last Updated: 3/1/2020
+# Last Updated: 3/2/2020
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -40,6 +40,10 @@ evaluate_models(sdf.med_price, sdf.date2, p_values,d_values, q_values)
 
 gs_approved_model = run_arima(sdf.med_price, sdf.date2, 1,1,2)
 gs_approved_model.summary()
+
+randsample = [num for num in np.random.randint(1,38006, 10)]
+for i in randsample:
+    print(condwa.iloc[i])
 
 
 '''~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~RNN Model~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'''

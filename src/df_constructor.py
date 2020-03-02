@@ -6,7 +6,7 @@
 import pandas as pd 
 import numpy as np
 import multiprocessing as mp
-from functions import convert_panel, int_convert
+from functions import convert_panel, int_convert, assign_names
 
 #reading in and restructuring my data to fit panel format
 df = pd.read_csv('medsales.csv',header=None)
@@ -124,19 +124,22 @@ new.index.names = ['city_id', 'date']
 condo = pd.read_csv('condos.csv', header=None)
 condo.drop(4, axis=1, inplace=True)
 panel_ready = convert_panel(condo,4)
-dfpr = pd.DataFrame(panel_ready)
-dfpr.to_pickle('condo.pkl', compression='zip')
+condop = pd.DataFrame(panel_ready)
+assign_names(condop)
+condop.to_pickle('condo.pkl', compression='zip')
 
 obd = pd.read_csv('onebedroom.csv', header=None)
 obd.drop(4, axis=1, inplace=True)
 next_sheet = convert_panel(obd,4)
 obdp = pd.DataFrame(next_sheet)
+assign_names(obdp)
 obdp.to_pickle('obr.pkl', compression='zip')
 
 tbr = pd.read_csv('twobedroom.csv', header=None)
 tbr.drop(4, axis=1, inplace=True)
 next_sheet2 = convert_panel(tbr,4)
 tbrp = pd.DataFrame(next_sheet2)
+assign_names(tbrp)
 tbrp.to_pickle('tbr.pkl', compression='zip')
 
 threebr = pd.read_csv('threebedroom.csv', header=None)
@@ -144,6 +147,7 @@ threebr.drop(5, axis=1, inplace=True)
 threebr.drop(4, axis=1, inplace=True)
 next_sheet4 = convert_panel(threebr,4)
 threebrp = pd.DataFrame(next_sheet4)
+assign_names(threebrp)
 threebrp.to_pickle('threebr.pkl', compression='zip')
 
 fourbr = pd.read_csv('fourbedroom.csv', header=None)
@@ -151,6 +155,7 @@ fourbr.drop(5, axis=1, inplace=True)
 fourbr.drop(4, axis=1, inplace=True)
 next_sheet5 = convert_panel(fourbr,4)
 fourbrp = pd.DataFrame(next_sheet5)
+assign_names(fourbrp)
 fourbrp.to_pickle('fourbr.pkl', compression='zip')
 
 fplus = pd.read_csv('five_plus.csv', header=None)
@@ -158,7 +163,31 @@ fplus.drop(5, axis=1, inplace=True)
 fplus.drop(4, axis=1, inplace=True)
 next_sheet3 = convert_panel(fplus,4)
 fplusp = pd.DataFrame(next_sheet3)
+assign_names(fplusp)
 fplusp.to_pickle('fplus.pkl', compression='zip')
+
+#setting time variable and converting from strings to floats
+pool = mp.Pool(mp.cpu_count())
+dfpr.est_val = pool.map(int_convert,[row for row in dfpr.est_val])
+obdp.est_val = pool.map(int_convert,[row for row in obdp.est_val])
+tbrp.est_val = pool.map(int_convert,[row for row in tbrp.est_val])
+threebrp.est_val = pool.map(int_convert,[row for row in threebrp.est_val])
+fplusp.est_val = pool.map(int_convert,[row for row in fplusp.est_val])
+fourbrp.est_val = pool.map(int_convert,[row for row in fourbrp.est_val])
+
+fourbrp['date'] = pool.map(make_date,[row for row in fourbrp.date])
+dfpr['date'] = pool.map(make_date,[row for row in dfpr.date])
+obdp['date'] = pool.map(make_date,[row for row in obdp.date])
+tbrp['date'] = pool.map(make_date,[row for row in tbrp.date])
+threebrp['date'] = pool.map(make_date,[row for row in threebrp.date])
+fplusp['date'] = pool.map(make_date,[row for row in fplusp.date])
+
+pool.close()
+
+dfpr.dropna(axis=0, inplace=True, how='any')
+condwa = dfpr[dfpr["state"] == 'WA']
+condtrain = dfpr[dfpr["state"] != 'WA']
+
 
 
 
