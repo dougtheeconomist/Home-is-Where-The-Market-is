@@ -202,6 +202,11 @@ def assign_names(df):
                    1: 'id', 2: 'city', 3: 'state', 4: 'est_val' }, inplace=True)
     return df
 
+def showcase(city,df):
+    show = df[df['city'] = city]
+    
+
+
 
 '''~~~~~~~~~~~~~~~~~~~~~~~~Modified From The Ether~~~~~~~~~~~~~~~~~~~~~~~~'''
 
