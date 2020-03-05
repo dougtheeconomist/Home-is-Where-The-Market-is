@@ -44,6 +44,17 @@ def convert_panel(df,ec):
 
     return final_form
 
+def load_and_convert(filepath,ec):
+    '''
+    For loading csv files and converting them into panel format
+    filepath: filepath of csv or other file with variable to convert
+
+    ec: number of extra columns prior to variable of interest to pass to conver_panel
+    '''
+    df = pd.read_csv(filepath,header=None)
+    newsheet = convert_panel(df,ec)
+    dfpr = pd.DataFrame(newsheet)
+    return dfpr
 
 def int_convert(val):
     crit = type(val)
@@ -204,7 +215,7 @@ def assign_names(df):
 
 def showcase(city,df):
     show = df[df['city'] = city]
-    
+
 
 
 

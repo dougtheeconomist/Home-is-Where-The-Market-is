@@ -70,4 +70,9 @@ Lex.summary()
 #Fitting model with training data, setting epochs to five for now, can always do additional training later
 Lex.fit(x_train, y_train, epochs=5)
 
+#To test prior to making actual predictions
+n_prev = 12
 
+x_train, x_test, y_train, y_test = split_and_windowize(sdf.logmp, n_prev)
+x_train.shape, x_test.shape, y_train.shape, y_test.shaper
+y_crit = y_train[-1]

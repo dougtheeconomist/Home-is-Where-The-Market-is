@@ -6,40 +6,26 @@
 import pandas as pd 
 import numpy as np
 import multiprocessing as mp
-from functions import convert_panel, int_convert, assign_names
+from functions import convert_panel, int_convert, assign_names, load_and_convert
 
 #reading in and restructuring my data to fit panel format
-df = pd.read_csv('medsales.csv',header=None)
-panel_ready = convert_panel(df,4)
-dfpr = pd.DataFrame(panel_ready)
 
-df2 = pd.read_csv('scount2.csv', header=None)
-newsheet = convert_panel(df2,4)
-dfpr2 = pd.DataFrame(newsheet)
+dfpr = load_and_convert('medsales.csv',4)
 
-df3 = pd.read_csv('med_cut.csv',header=None)
-newsheet3 = convert_panel(df3,4)
-dfpr4 = pd.DataFrame(newsheet3)
+dfpr2 = load_and_convert('scount2.csv', 4)
 
-df5 = pd.read_csv('n_days.csv', header=None)
-newsheet5 = convert_panel(df5,4)
-dfpr5 = pd.DataFrame(newsheet5)
+dfpr4 = load_and_convert('med_cut.csv',4)
 
-df6 = pd.read_csv('foreclosed.csv',header=None)
-newsheet6 = convert_panel(df6,4)
-dfpr6= pd.DataFrame(newsheet6)
+dfpr5 = load_and_convert('n_days.csv', 4)
 
-df7 = pd.read_csv('raw_inv.csv',header=None)
-newsheet7 = convert_panel(df7,4)
-dfpr7 = pd.DataFrame(newsheet7)
+dfpr6= load_and_convert('foreclosed.csv',4)
 
-df8 = pd.read_csv('new_listings.csv',header=None)
-newsheet8 = convert_panel(df8,4)
-dfpr8 = pd.DataFrame(newsheet8)
+dfpr7 = load_and_convert('raw_inv.csv',4)
 
-df9 = pd.read_csv('med_daily.csv',header=None)
-newsheet9 = convert_panel(df9,4)
-dfpr9 = pd.DataFrame(newsheet9)
+dfpr8 = load_and_convert('new_listings.csv',4)
+
+dfpr9 = load_and_convert('med_daily.csv',4)
+
 
 #naming columns so that I can conveniently call them when merging
 dfpr.rename(columns={0: 'date', 
