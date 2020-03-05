@@ -17,15 +17,7 @@ I first look at the variable that I am most interested in predicting; median sal
 
 ![total_spread_hist](images/tot_medprice.png)
 
-The next histogram shows the spread of the average of all markets' medians grouped by time. 
-
-![mean_across_cities_hist](images/mean_medprice_gbtime.png)
-
-Then I look at the spread of the means grouped by city across the different time-spans.
-
-![mean_over_time_hist](images/mean_medprice_gbcity.png)
-
-Lastly, I look at a plot of this variable over time for a single market, I choose to look at Seattle as this is where I am currently located, as well as several other random locations. These can be seen below to get an idea of how the price within a given city has been fluctuating since 2008 or so. 
+Then I look at a plot of this variable over time for a single market, I choose to look at Seattle as this is where I am currently located, as well as several other random locations. These can be seen below to get an idea of how the price within a given city has been fluctuating since 2008 or so. 
 
 ![snapshot_of_different_markets](images/sample_cities_medprice.png)
 
@@ -56,4 +48,9 @@ These transformations do mean that in order to interpret the results of my model
 
 I train my model on thousands of different observations from six different sets of data, one for each size of home. I do this over five epochs for each group, meaning that for each home size in each state I train with I have it repeat the process of going through all of this data 5 times. 
 Once trained I test this model by utilizing a test/train split on cities in states that I don't use for training. I both graphically analyze the results of this testing as well as calculate the mean squared error between the actual and predicted values. 
-use this model to generate predictions for markets within Washington state.
+
+My initial test of the fully trained model is on the market for three bedroom homes in Austin, Texas, the results of which can be seen in the following graph.
+
+![trained_trial](images/austin3.png)
+
+Visually, this looks very encouraging, but because of the scale in terms of price involved, it is useful to measure the difference using metrics. The most common of which is mean squared error, which in this case is 31003790. This seems big; this is because this is the average of the difference between the predicted points and the actual values after squaring those differences; which we do to avoid positive and negative differences cancelling out. Taking the square root of this gives us a more useful metric. This number is 5,568.10, for context, this is 1.5% of the median home value for a three bedroom at the end of 2019. 
