@@ -1,4 +1,4 @@
-# Homes_For_Sale
+# Home is Where The Market is
 Building a predictive model of the housing market
 
 ![Header_image](images/for_sale_header1.jpg)
