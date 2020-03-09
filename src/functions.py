@@ -196,6 +196,16 @@ def reconstruct(series, start):
 
     return final_predictions
 
+def get_actual(y_crit, preds):
+    log = [y_crit]
+    for i in preds:
+        log.append(log[-1]+i)
+
+    logs = pd.Series(log)
+    newpreds = np.e**(logs)
+    return newpreds
+
+
 def ensemble(m1,m2):
     me = []
     for i in range(0, len(m1)):
@@ -217,6 +227,20 @@ def showcase(city,df):
     show = df[df['city'] = city]
 
 
+def make_ready(df,nd):
+    '''
+    Takes dataframe for single city and returns dataframe with extended index in which
+    to append results of forecast
+    
+    df: dataframe containing variable to forecast with index set to datetime variable
+    
+    nd: list of new datetimes to append to original dataframe, should be at least as long as
+        number of desired periods to forecast ahead
+    '''
+    dfi = pd.DataFrame(data =None, index = nd)
+    dfnew = pd.DataFrame(data =None, index = df.index.append(dfi.index))
+    fr = pd.merge(dfnew,aut3, left_index=True, right_index= True, how = 'left')
+    return fr
 
 
 '''~~~~~~~~~~~~~~~~~~~~~~~~Modified From The Ether~~~~~~~~~~~~~~~~~~~~~~~~'''

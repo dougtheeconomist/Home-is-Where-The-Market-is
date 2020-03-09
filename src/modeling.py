@@ -23,7 +23,7 @@ keras = tf.keras
 from scipy import stats
 from sklearn.model_selection import train_test_split
 
-from functions import windowize_pan_data, windowize_pan_data_LD, winpan_helper evaluate_models, evaluate_arima_model, format_list_of_floats, run_arima, windowize_data, split_and_windowize
+from functions import make_ready, windowize_pan_data, windowize_pan_data_LD, winpan_helper, evaluate_models, evaluate_arima_model, format_list_of_floats, run_arima, windowize_data, split_and_windowize
 
 
 df = pd.read_pickle('user_ready.pkl',compression='zip')
@@ -76,3 +76,7 @@ n_prev = 12
 x_train, x_test, y_train, y_test = split_and_windowize(sdf.logmp, n_prev)
 x_train.shape, x_test.shape, y_train.shape, y_test.shaper
 y_crit = y_train[-1]
+
+
+#loading Lex from file
+Lex = tf.keras.models.load_model('Lex_prime')

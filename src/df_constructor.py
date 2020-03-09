@@ -6,7 +6,7 @@
 import pandas as pd 
 import numpy as np
 import multiprocessing as mp
-from functions import convert_panel, int_convert, assign_names, load_and_convert
+from functions import convert_panel, int_convert, assign_names, load_and_convert, make_date
 
 #reading in and restructuring my data to fit panel format
 
