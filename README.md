@@ -38,7 +38,7 @@ The likely explanation for this is that there are other explanatory variables th
 
 Moving forward I find another problem with using ARIMA; the model fails to converge entirely on a specification when I attempt to model values for specific home size. When attempting to create a forecast I generate a straight line 
 
-# Graph of ARIMA result here
+![ARIMA_graph](images/arima.png)
 
 Because of this lack of results in some cases combined with the specification problem making the model non-generalizable across cities, moving forward I focus my efforts on the deep-learning approach.
 
