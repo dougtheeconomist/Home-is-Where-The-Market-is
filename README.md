@@ -61,4 +61,8 @@ Visually, this looks very encouraging, but because of the scale in terms of the 
 
 The next step is to actually use the trained model to generate future predictions for cities within the state of Washington and save them to a database where they could be queried by potential users. 
 
+The following is a graph of an 18 month forecast generated for the city of Austin,Texas; I initially demonstrate with this city for consistency with my model's testing, to make sure that my forecast is being generated properly. 
+
+![Austin_forecast](images/initial_prediction.png)
+
 After that, the over-arching goal of this study is to create an online dashboard for users to interact with the prediction database. A user would be able to specify a city and the number of bedrooms in the home they are interested in selling or buying, and then recieve forecast and historic information for that market. 
