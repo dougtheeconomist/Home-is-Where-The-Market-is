@@ -1,7 +1,7 @@
 # Title: functions
 # Author: Doug Hart
 # Date Created: 2/25/2020
-# Last Updated: 2/29/2020
+# Last Updated: 3/10/2020
 
 import pandas as pd
 import numpy as np
@@ -223,8 +223,22 @@ def assign_names(df):
                    1: 'id', 2: 'city', 3: 'state', 4: 'est_val' }, inplace=True)
     return df
 
-def showcase(city,df):
-    show = df[df['city'] = city]
+def oprep(df):
+    '''
+    Takes single city dataframe, resets index and conducts data transformations
+    for model input
+
+    Helper function for rollingthunder
+    '''
+    df.reset_index(drop=True, inplace=True)
+    df['logform'] = np.log(df.est_val)
+    df['logdiff'] = None
+    for i in range(1, len(df.logform)):
+        df.logdiff[i] = (df.logform[i]-df.logform[i-1])
+    df.logdiff[0] = None
+    df.logdiff[0] = df.logdiff.mean()
+    df.set_index(df.date, inplace=True)
+    return df
 
 
 def make_ready(df,nd):
@@ -241,6 +255,62 @@ def make_ready(df,nd):
     dfnew = pd.DataFrame(data =None, index = df.index.append(dfi.index))
     fr = pd.merge(dfnew,aut3, left_index=True, right_index= True, how = 'left')
     return fr
+
+def add_one(df, nd, new_datum):
+    '''
+    Appends an additional row to working dataframe with latest predicted value
+    
+    Helper function for rollingthunder
+    df: dataframe upon which to predict
+    nd:datetime list to append to index
+    new_datum: latest prediction from Lex
+    '''
+    out = df.append({'logdiff': new_datum,'date': nd}, ignore_index=True)
+    out.set_index(out.date, inplace=True)
+    return out
+
+def single_window(data, n_prev=12):
+    '''
+    windowizes a single window to generate one prediction;
+    since Lex is trained and generating one prediction ahead at a time,
+    only need to pass one prediction's worth of data.
+    
+    Helper function for rollingthunder
+    '''
+    x = np.array(data[-n_prev:])
+    x.reshape(1,12,1)
+    return x
+
+def rollingthunder(df, nd, model, ndlist, num = 18, n_prev=12):
+    '''
+    Takes dataframe, transforms data, sets and extends time index, and then generates
+    multiple forecasts by individaul points and then appending those points into data
+    to generate subsequent point.
+    
+    df: dataframe
+    
+    nd:datetime list to append to index
+    
+    model: rnn model used to generate predictions
+    
+    ndlist: list of strings of dates to be appended to index, 
+            used to append new values properly
+    
+    num: number of future predictions to generate
+    
+    n_prev: number of past observations to use when calculating next value
+    '''
+    df = oprep(df)
+    y_crit = df['logform'][-1]
+    predict_list = []
+
+    for i in range(num):
+        xactual = single_window(df.logdiff)
+        prediction = model.predict(xactual.reshape(1,12,1))
+        predict_list.append(prediction[-1][0])
+        df = add_one(df,nd[i],prediction[-1][0])
+    return y_crit, predict_list, df
+
 
 
 '''~~~~~~~~~~~~~~~~~~~~~~~~Modified From The Ether~~~~~~~~~~~~~~~~~~~~~~~~'''
@@ -336,10 +406,9 @@ def batch_producer(raw_data, data_len, batch_size, num_steps):
 
 '''~~~~~~~~~~~~~~~~~~~~~~~~~~Borrowed from Lecture~~~~~~~~~~~~~~~~~~~~~~~~~~'''
 
-def windowize_data(data, n_prev):
+def windowize_data(data, n_prev=12):
     n_predictions = len(data) - n_prev
     y = data[n_prev:]
-    # this might be too clever
     indices = np.arange(n_prev) + np.arange(n_predictions)[:, None]
     x = data[indices, None]
     return x, y
