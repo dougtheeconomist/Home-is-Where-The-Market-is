@@ -324,7 +324,9 @@ def insample_predict(df):
     set_x, set_y = windowize_pan_data_LD(df.est_val,df.id,12)
     
     testresults = Lex.predict(apredx)
-    return testresults, set_y
+    tr= [testresults[i][0] for i in range(0,len(testresults))]
+    trarray = np.array(tr)
+    return trarray, set_y
 
 def calc_interval():
     '''
