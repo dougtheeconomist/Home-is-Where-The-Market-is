@@ -307,8 +307,10 @@ def rollingthunder(df, nd, model, ndlist, num = 18, n_prev=12):
     for i in range(num):
         xactual = single_window(df.logdiff)
         prediction = model.predict(xactual.reshape(1,12,1))
-        predict_list.append(prediction[-1][0])
+#         predict_list.append(prediction[-1][0])
         df = add_one(df,nd[i],prediction[-1][0])
+        df.est_val[-1] = (np.e**(df.logform[-1]))
+        predict_list.append(df.est_val[-1])
     return y_crit, predict_list, df
 
 def insample_predict(df):
@@ -328,7 +330,7 @@ def insample_predict(df):
     trarray = np.array(tr)
     return trarray, set_y
 
-def calc_interval():
+def calc_interval(df):
     '''
     Calculates size of interval forecast based on difference of in-sample predictions and
     historic data
@@ -340,7 +342,102 @@ def calc_interval():
     crit = rse*1.65
     return crit
 
+def rollingthunder_subdued(df, nd, model, ndlist, num = 18, n_prev=12):
+    '''
+    Takes dataframe, transforms data, sets and extends time index, and then generates
+    multiple forecasts by individaul points and then appending those points into data
+    to generate subsequent point.
+    subdued form generates lower bound of 90% interval forecast
+    
+    df: dataframe
+    
+    nd:datetime list to append to index
+    
+    model: rnn model used to generate predictions
+    
+    ndlist: list of strings of dates to be appended to index, 
+            used to append new values properly
+    
+    num: number of future predictions to generate
+    
+    n_prev: number of past observations to use when calculating next value
+    '''
+    df = oprep(df)
+    y_crit = df['logform'][-1]
+    interval = calc_interval(df)
+    
+    predict_list = []
+    for i in range(num):
+        xactual = single_window(df.logdiff)
+        prediction = model.predict(xactual.reshape(1,12,1))
+#         predict_list.append(prediction[-1][0])
+        df = add_one(df,nd[i],((prediction[-1][0])-interval))
+        df.est_val[-1] = (np.e**(df.logform[-1]))
+        predict_list.append(df.est_val[-1])
+    return y_crit, predict_list, df
 
+
+def rollingthunder_enthusiastic(df, nd, model, ndlist, num = 18, n_prev=12):
+    '''
+    Takes dataframe, transforms data, sets and extends time index, and then generates
+    multiple forecasts by individaul points and then appending those points into data
+    to generate subsequent point.
+    enthusiastic form generates upper bound of 90% interval forecast
+    
+    df: dataframe
+    
+    nd:datetime list to append to index
+    
+    model: rnn model used to generate predictions
+    
+    ndlist: list of strings of dates to be appended to index, 
+            used to append new values properly
+    
+    num: number of future predictions to generate
+    
+    n_prev: number of past observations to use when calculating next value
+    '''
+    df = oprep(df)
+    y_crit = df['logform'][-1]
+    interval = calc_interval(df)
+    
+    predict_list = []
+    for i in range(num):
+        xactual = single_window(df.logdiff)
+        prediction = model.predict(xactual.reshape(1,12,1))
+#         predict_list.append(prediction[-1][0])
+        df = add_one(df,nd[i],((prediction[-1][0])+interval))
+        df.est_val[-1] = (np.e**(df.logform[-1]))
+        predict_list.append(df.est_val[-1])
+    return y_crit, predict_list, df
+
+def maxthunder(df, nd, model, ndlist, num = 12, n_prev=12):
+    ycritl, pessimistic, null= rollingthunder_subdued(df, nd, model, ndlist, num, n_prev)
+    ycrit, pointpred, history = rollingthunder(df, nd, model, ndlist, num, n_prev)
+    ycrit2, optimistic, void = rollingthuder_enthusiastic(df, nd, model, ndlist, num, n_prev)
+    
+    return pessimistic, pointpred, optimistic, history
+
+
+def graphicthunder(df, nd, model, ndlist, num = 12, n_prev=12):
+    '''
+    Graphs results of total forecast for a given city
+
+    Should find how to shade region between plots for consistency with ARIMA 
+    graphic output. 
+    '''
+    low, mid, high, hstry = maxthunder(df, nd, model, ndlist, num, n_prev)
+    
+    fig, ax = plt.subplots(figsize=(12,6))
+    ax.plot( hstry.date[-11:], low, 'm', label='Lower Bounds')
+    ax.plot( hstry.date[-11:], mid, 'm.-', label='Forecast')
+    ax.plot( hstry.date[-11:], high, 'm', label='Upper Bounds')
+    
+    ax.plot(hstry.date[100:-11], hstry.est_val[100:-11], 'c', label='Historic')
+    ax.set_xlabel('Time',fontsize = 18)
+    ax.set_ylabel('Median Home Price',fontsize = 18)
+    ax.set_title('12 Month Forecast for Austin, TX',fontsize = 22, pad = 8)
+    ax.legend()
 
 
 '''~~~~~~~~~~~~~~~~~~~~~~~~Modified From The Ether~~~~~~~~~~~~~~~~~~~~~~~~'''
