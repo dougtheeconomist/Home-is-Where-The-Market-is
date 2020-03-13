@@ -311,6 +311,34 @@ def rollingthunder(df, nd, model, ndlist, num = 18, n_prev=12):
         df = add_one(df,nd[i],prediction[-1][0])
     return y_crit, predict_list, df
 
+def insample_predict(df):
+    '''
+    Takes data for city and generates x, y arrays to generate predictions for entire timeframe.
+    To be used to find measurement of error of model for city to calculate forecast interval
+    Helper function for calc_interval
+    
+    df: dataframe of city data to forecast
+    '''
+    df.reset_index(drop=True, inplace=True)
+    df.set_index(aut3.date, inplace=True)
+    set_x, set_y = windowize_pan_data_LD(df.est_val,df.id,12)
+    
+    testresults = Lex.predict(apredx)
+    return testresults, set_y
+
+def calc_interval():
+    '''
+    Calculates size of interval forecast based on difference of in-sample predictions and
+    historic data
+    Helper function for interval predict(TBW)
+    '''
+    predicted, actual = insample_predict(df)
+    sq_err= (actual-predicted)**2
+    rse = sq_err**.5
+    crit = rse*1.65
+    return crit
+
+
 
 
 '''~~~~~~~~~~~~~~~~~~~~~~~~Modified From The Ether~~~~~~~~~~~~~~~~~~~~~~~~'''
